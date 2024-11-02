@@ -1,101 +1,156 @@
+"use client"; // Ensure this component is rendered on the client side
+import {
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Button,
+  SelectChangeEvent,
+  Snackbar,
+} from "@mui/material";
 import Image from "next/image";
+import { useState } from "react";
 
-export default function Home() {
+export default function AirdropPage() {
+  const [amount, setAmount] = useState<string>("");
+  const [walletAddress, setWalletAddress] = useState<string>("");
+  const [snackbarOpen, setSnackbarOpen] = useState<boolean>(false);
+  const [snackbarMessage, setSnackbarMessage] = useState<string>("");
+
+  const handleAmountChange = (event: SelectChangeEvent<string>) => {
+    setAmount(event.target.value);
+  };
+
+  const handleWalletAddressChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setWalletAddress(event.target.value);
+  };
+
+  const handleAirdrop = async () => {
+    try {
+      const response = await fetch("http://localhost:3000/api/airdrop", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ walletAddress, amount }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setSnackbarMessage(data.message);
+      } else {
+        setSnackbarMessage(data.error || "Airdrop failed. Please try again.");
+      }
+      setSnackbarOpen(true); // Open the snackbar to show the message
+    } catch (error) {
+      console.log("Error giving airdrop!", error);
+      setSnackbarMessage("Airdrop failed due to an unexpected error.");
+      setSnackbarOpen(true);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
+    <div className="flex flex-col justify-center items-center h-screen bg-gray-900">
+      <div className="mb-8 text-xl">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
+          src="/solana_image.svg"
+          alt="Solana Faucet"
+          width={200}
+          height={50}
         />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      </div>
+      <div className="border border-gray-600 rounded-lg p-8 bg-gray-800 text-center max-w-md w-full">
+        <div className="font-semibold text-2xl text-white mb-2">
+          Request Airdrop
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        <p className="text-slate-400 font-bold mb-6">
+          Maximum number of two requests per hour
+        </p>
+        <div className="flex space-x-4 mb-6">
+          <TextField
+            variant="outlined"
+            label="Wallet address"
+            value={walletAddress}
+            onChange={handleWalletAddressChange}
+            InputProps={{
+              style: { color: "#e0e0e0" },
+            }}
+            InputLabelProps={{
+              style: { color: "#b0b0b0" },
+            }}
+            sx={{
+              flex: 1,
+              "& .MuiOutlinedInput-root": {
+                "& fieldset": {
+                  borderColor: "rgb(129, 140, 160)",
+                },
+                "&:hover fieldset": {
+                  borderColor: "rgb(156, 163, 175)",
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "white",
+                },
+              },
+            }}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+          <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+            <InputLabel sx={{ color: "#b0b0b0" }}>Amount</InputLabel>
+            <Select
+              value={amount}
+              onChange={handleAmountChange}
+              label="Amount"
+              sx={{
+                color: "#e0e0e0",
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgb(129, 140, 160)",
+                },
+                "&:hover .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "rgb(156, 163, 175)",
+                },
+                "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                  borderColor: "white",
+                },
+                "& .MuiSvgIcon-root": {
+                  color: "#b0b0b0",
+                },
+              }}
+            >
+              <MenuItem value="0.5">0.5</MenuItem>
+              <MenuItem value="1">1</MenuItem>
+              <MenuItem value="1.5">1.5</MenuItem>
+              <MenuItem value="2">2</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <Button
+          variant="contained"
+          disabled={!walletAddress || !amount}
+          onClick={handleAirdrop}
+          sx={{
+            backgroundColor: walletAddress && amount ? "#4fc3f7" : "#fbf7fa",
+            color: "white",
+            "&:hover": {
+              backgroundColor: walletAddress && amount ? "#29b6f6" : "#fbf7fa",
+            },
+            "&.Mui-disabled": {
+              backgroundColor: "#fbf7fa",
+              color: "#888",
+            },
+          }}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          Confirm Airdrop
+        </Button>
+        <Snackbar
+          open={snackbarOpen}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+          autoHideDuration={4000}
+        />
+      </div>
     </div>
   );
 }
