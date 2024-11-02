@@ -30,7 +30,7 @@ export default function AirdropPage() {
 
   const handleAirdrop = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/airdrop", {
+      const response = await fetch(`/api/airdrop`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

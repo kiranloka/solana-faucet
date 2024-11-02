@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { LRUCache } from "lru-cache";
 
-const RPC_URL =
-  "https://solana-devnet.g.alchemy.com/v2/J_7sdFmL0dDUGmO0ilhad6qIQXf19Uyv";
+const RPC_URL = `${process.env.NEXT_PUBLIC_RPC_URL}`;
 
 const rateLimitCache = new LRUCache<
   string,
