@@ -30,13 +30,16 @@ export default function AirdropPage() {
 
   const handleAirdrop = async () => {
     try {
-      const response = await fetch(`/api/airdrop`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/airdrop`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ walletAddress, amount }),
         },
-        body: JSON.stringify({ walletAddress, amount }),
-      });
+      );
 
       const data = await response.json();
       if (response.ok) {
